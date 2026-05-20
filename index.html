@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vape2Me | Local Vape Delivery MVP</title>
+  <meta name="description" content="Vape2Me is a local 21+ vape delivery MVP for browsing products, building a cart, and requesting delivery." />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --panel: #181820;
+      --panel-2: #222230;
+      --text: #f7f7fb;
+      --muted: #b7b7c6;
+      --accent: #7c3aed;
+      --accent-2: #a78bfa;
+      --border: #303040;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(15, 15, 18, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .age-badge,
+    .pill {
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      background: var(--panel);
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at top right, rgba(124, 58, 237, 0.45), transparent 35%),
+        linear-gradient(135deg, #25124d, #15151c 65%);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.35rem, 13vw, 4.75rem);
+      line-height: 0.95;
+      font-weight: 950;
+      letter-spacing: -0.07em;
+    }
+
+    .text-muted-custom {
+      color: var(--muted);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+      border: 0;
+      border-radius: 1rem;
+      font-weight: 800;
+      padding: 0.9rem 1.1rem;
+    }
+
+    .btn-accent:hover,
+    .btn-accent:focus {
+      background: #6d28d9;
+      color: white;
+    }
+
+    .btn-soft {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .btn-soft.active {
+      background: white;
+      color: #111;
+      border-color: white;
+    }
+
+    .product-card,
+    .cart-panel,
+    .age-panel,
+    .order-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 1.35rem;
+    }
+
+    .product-img {
+      height: 135px;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, var(--panel-2), #111);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-2);
+      font-size: 2.4rem;
+      font-weight: 900;
+    }
+
+    .price {
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    .cart-item {
+      background: #101016;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+      background: #101016;
+      border: 1px solid var(--border);
+      color: white;
+      border-radius: 0.9rem;
+      padding: 0.85rem 1rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background: #101016;
+      color: white;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.2);
+    }
+
+    .form-control::placeholder {
+      color: #747485;
+    }
+
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: white;
+      font-weight: 900;
+    }
+
+    .desktop-cart {
+      display: none;
+    }
+
+    .bottom-cart-bar {
+      position: sticky;
+      bottom: 0;
+      z-index: 30;
+      background: rgba(15, 15, 18, 0.95);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: #8e8ea2;
+    }
+
+    @media (min-width: 992px) {
+      .desktop-cart {
+        display: block;
+        position: sticky;
+        top: 92px;
+      }
+
+      .bottom-cart-bar {
+        display: none;
+      }
+
+      .product-img {
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="ageGate" class="app-shell d-flex align-items-center justify-content-center p-3">
+    <section class="age-panel p-4 p-sm-5 text-center w-100" style="max-width: 520px;">
+      <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-4" style="width:64px;height:64px;background:var(--accent);font-size:2rem;">✓</div>
+      <h1 class="logo display-5 mb-2">Vape2Me</h1>
+      <p class="text-muted-custom mb-4">This demo is intended only for adults 21+. Please confirm your age to continue.</p>
+      <button id="confirmAgeBtn" class="btn btn-accent w-100">I am 21 or older</button>
+      <p class="small-note mt-3 mb-0">Real launch requires legal review, licensing, ID verification, and local compliance checks.</p>
+    </section>
+  </div>
+
+  <div id="app" class="app-shell d-none">
+    <header class="topbar">
+      <div class="container py-3 d-flex justify-content-between align-items-center gap-3">
+        <div>
+          <div class="logo h3 mb-0">Vape2Me</div>
+          <div class="small text-muted-custom">Local 21+ delivery MVP</div>
+        </div>
+        <div class="age-badge">21+ only</div>
+      </div>
+    </header>
+
+    <main class="container py-4">
+      <section class="hero mb-4">
+        <p class="fw-bold text-uppercase small mb-2" style="color:var(--accent-2);letter-spacing:.12em;">Fast local delivery</p>
+        <h1 class="mb-3">Browse. Verify. Get delivery.</h1>
+        <p class="lead text-muted-custom mb-0">A lean MVP for local vape delivery requests with products, cart totals, customer info, and ID-verification notes.</p>
+      </section>
+
+      <div class="row g-4 align-items-start">
+        <section class="col-lg-8">
+          <div class="d-flex gap-2 overflow-auto pb-2 mb-3" id="categoryFilters"></div>
+          <div class="row g-3" id="productGrid"></div>
+        </section>
+
+        <aside class="col-lg-4 desktop-cart">
+          <div class="cart-panel p-3">
+            <div id="desktopCart"></div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <div class="bottom-cart-bar p-3">
+      <button class="btn btn-accent w-100 d-flex justify-content-between align-items-center" data-bs-toggle="offcanvas" data-bs-target="#cartDrawer">
+        <span>View order</span>
+        <span><span id="mobileCartCount">0</span> items · <span id="mobileCartTotal">$0.00</span></span>
+      </button>
+    </div>
+
+    <div class="offcanvas offcanvas-bottom text-bg-dark" tabindex="-1" id="cartDrawer" style="height: 88vh; border-radius: 1.5rem 1.5rem 0 0;">
+      <div class="offcanvas-header">
+        <h2 class="offcanvas-title h4 fw-black">Your order</h2>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div id="mobileCart"></div>
+      </div>
+    </div>
+  </div>
+
+  <template id="cartTemplate">
+    <div>
+      <h2 class="h4 fw-bold mb-3">Your order</h2>
+      <div class="cartItems mb-3"></div>
+
+      <div class="border-top pt-3 mb-3" style="border-color:var(--border)!important;">
+        <div class="d-flex justify-content-between small mb-1"><span>Subtotal</span><strong class="subtotal">$0.00</strong></div>
+        <div class="d-flex justify-content-between small mb-1"><span>Delivery fee</span><strong class="deliveryFee">$0.00</strong></div>
+        <div class="d-flex justify-content-between fs-5"><span>Total</span><strong class="total">$0.00</strong></div>
+        <p class="minimumWarning small-note mt-2 mb-0"></p>
+      </div>
+
+      <form class="orderForm">
+        <h3 class="h6 fw-bold mb-2">Delivery info</h3>
+        <input class="form-control mb-2 customerName" placeholder="Full name" required />
+        <input class="form-control mb-2 customerPhone" placeholder="Phone number" required />
+        <input class="form-control mb-2 customerAddress" placeholder="Delivery address" required />
+        <textarea class="form-control mb-3 customerNotes" placeholder="Delivery notes" rows="3"></textarea>
+        <button class="btn btn-accent w-100 checkoutBtn" type="submit">Request order</button>
+      </form>
+
+      <p class="small-note mt-3 mb-0">ID must be checked before handoff. Do not fulfill orders for intoxicated, aggressive, underage, or unverifiable customers.</p>
+    </div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const products = [
+      { id: 1, name: 'Geek Bar Pulse', category: 'Disposable', flavor: 'Blue Razz Ice', price: 19.99, stock: 12, nicotine: '5%', symbol: 'GB' },
+      { id: 2, name: 'Lost Mary OS5000', category: 'Disposable', flavor: 'Watermelon Ice', price: 17.99, stock: 8, nicotine: '5%', symbol: 'LM' },
+      { id: 3, name: 'GeekVape U Pod', category: 'Pods', flavor: '0.7Ω Replacement Pod', price: 9.99, stock: 15, nicotine: 'N/A', symbol: 'UP' },
+      { id: 4, name: 'Salt Nic Bottle', category: 'E-Liquid', flavor: 'Menthol 30ml', price: 14.99, stock: 6, nicotine: '35mg', symbol: 'SN' },
+      { id: 5, name: 'GeekVape Q Pod', category: 'Pods', flavor: '0.8Ω Replacement Pod', price: 9.99, stock: 10, nicotine: 'N/A', symbol: 'QP' },
+      { id: 6, name: 'Disposable Vape', category: 'Disposable', flavor: 'Strawberry Kiwi', price: 16.99, stock: 9, nicotine: '5%', symbol: 'DV' }
+    ];
+
+    const DELIVERY_FEE = 5;
+    const MINIMUM_ORDER = 20;
+
+    let selectedCategory = 'All';
+    let cart = [];
+    let customer = { name: '', phone: '', address: '', notes: '' };
+
+    const money = value => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+    document.getElementById('confirmAgeBtn').addEventListener('click', () => {
+      document.getElementById('ageGate').classList.add('d-none');
+      document.getElementById('app').classList.remove('d-none');
+      render();
+    });
+
+    function render() {
+      renderCategories();
+      renderProducts();
+      renderCart('desktopCart');
+      renderCart('mobileCart');
+      updateMobileCartBar();
+    }
+
+    function renderCategories() {
+      const categories = ['All', ...new Set(products.map(product => product.category))];
+      const wrapper = document.getElementById('categoryFilters');
+      wrapper.innerHTML = categories.map(category => `
+        <button class="btn btn-soft ${category === selectedCategory ? 'active' : ''}" data-category="${category}">${category}</button>
+      `).join('');
+
+      wrapper.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => {
+          selectedCategory = button.dataset.category;
+          render();
+        });
+      });
+    }
+
+    function renderProducts() {
+      const visibleProducts = selectedCategory === 'All'
+        ? products
+        : products.filter(product => product.category === selectedCategory);
+
+      document.getElementById('productGrid').innerHTML = visibleProducts.map(product => `
+        <div class="col-12 col-sm-6">
+          <article class="product-card p-3 h-100">
+            <div class="product-img mb-3">${product.symbol}</div>
+            <div class="d-flex justify-content-between gap-2 mb-1">
+              <h3 class="h5 fw-bold mb-0">${product.name}</h3>
+              <div class="price">${money(product.price)}</div>
+            </div>
+            <p class="text-muted-custom small mb-1">${product.flavor}</p>
+            <p class="small-note mb-3">Nicotine: ${product.nicotine} · Stock: ${product.stock}</p>
+            <button class="btn btn-accent w-100 addToCartBtn" data-id="${product.id}">Add to cart</button>
+          </article>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.addToCartBtn').forEach(button => {
+        button.addEventListener('click', () => addToCart(Number(button.dataset.id)));
+      });
+    }
+
+    function addToCart(productId) {
+      const product = products.find(item => item.id === productId);
+      const existing = cart.find(item => item.id === productId);
+
+      if (existing) {
+        existing.qty = Math.min(existing.qty + 1, product.stock);
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+
+      render();
+    }
+
+    function changeQty(productId, amount) {
+      const item = cart.find(product => product.id === productId);
+      if (!item) return;
+      item.qty += amount;
+      if (item.qty <= 0) cart = cart.filter(product => product.id !== productId);
+      if (item.qty > item.stock) item.qty = item.stock;
+      render();
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(product => product.id !== productId);
+      render();
+    }
+
+    function getTotals() {
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const deliveryFee = subtotal > 0 ? DELIVERY_FEE : 0;
+      return { subtotal, deliveryFee, total: subtotal + deliveryFee };
+    }
+
+    function renderCart(targetId) {
+      const target = document.getElementById(targetId);
+      const template = document.getElementById('cartTemplate');
+      target.innerHTML = '';
+      target.appendChild(template.content.cloneNode(true));
+
+      const { subtotal, deliveryFee, total } = getTotals();
+      const cartItems = target.querySelector('.cartItems');
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<div class="cart-item text-muted-custom">Cart is empty.</div>';
+      } else {
+        cartItems.innerHTML = cart.map(item => `
+          <div class="cart-item mb-2">
+            <div class="d-flex justify-content-between gap-2">
+              <div>
+                <div class="fw-bold">${item.name}</div>
+                <div class="small text-muted-custom">${item.flavor}</div>
+              </div>
+              <button class="btn btn-sm text-white removeBtn" data-id="${item.id}">×</button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="d-flex align-items-center gap-2">
+                <button class="qty-btn minusBtn" data-id="${item.id}">−</button>
+                <strong>${item.qty}</strong>
+                <button class="qty-btn plusBtn" data-id="${item.id}">+</button>
+              </div>
+              <strong>${money(item.price * item.qty)}</strong>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      target.querySelector('.subtotal').textContent = money(subtotal);
+      target.querySelector('.deliveryFee').textContent = money(deliveryFee);
+      target.querySelector('.total').textContent = money(total);
+
+      const warning = target.querySelector('.minimumWarning');
+      warning.textContent = subtotal > 0 && subtotal < MINIMUM_ORDER
+        ? `Minimum order is ${money(MINIMUM_ORDER)} before delivery.`
+        : '';
+
+      target.querySelector('.customerName').value = customer.name;
+      target.querySelector('.customerPhone').value = customer.phone;
+      target.querySelector('.customerAddress').value = customer.address;
+      target.querySelector('.customerNotes').value = customer.notes;
+
+      target.querySelectorAll('.plusBtn').forEach(btn => btn.addEventListener('click', () => changeQty(Number(btn.dataset.id), 1)));
+      target.querySelectorAll('.minusBtn').forEach(btn => btn.addEventListener('click', () => changeQty(Number(btn.dataset.id), -1)));
+      target.querySelectorAll('.removeBtn').forEach(btn => btn.addEventListener('click', () => removeFromCart(Number(btn.dataset.id))));
+
+      target.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', syncCustomerFromForms);
+      });
+
+      target.querySelector('.orderForm').addEventListener('submit', event => {
+        event.preventDefault();
+        syncCustomerFromForms();
+        requestOrder(targetId);
+      });
+    }
+
+    function syncCustomerFromForms() {
+      const form = document.querySelector('.orderForm');
+      if (!form) return;
+      customer.name = form.querySelector('.customerName').value;
+      customer.phone = form.querySelector('.customerPhone').value;
+      customer.address = form.querySelector('.customerAddress').value;
+      customer.notes = form.querySelector('.customerNotes').value;
+    }
+
+    function requestOrder(targetId) {
+      const { subtotal, total } = getTotals();
+
+      if (cart.length === 0) {
+        alert('Add at least one product first.');
+        return;
+      }
+
+      if (subtotal < MINIMUM_ORDER) {
+        alert(`Minimum order is ${money(MINIMUM_ORDER)} before delivery.`);
+        return;
+      }
+
+      if (!customer.name || !customer.phone || !customer.address) {
+        alert('Please enter your name, phone, and delivery address.');
+        return;
+      }
+
+      const orderLines = cart.map(item => `${item.qty}x ${item.name} - ${item.flavor}`).join('\n');
+      alert(`Order request received!\n\n${orderLines}\n\nTotal: ${money(total)}\n\nNext MVP step: send this to SMS, email, or a backend.`);
+
+      cart = [];
+      customer = { name: '', phone: '', address: '', notes: '' };
+      render();
+
+      if (targetId === 'mobileCart') {
+        const drawer = bootstrap.Offcanvas.getInstance(document.getElementById('cartDrawer'));
+        if (drawer) drawer.hide();
+      }
+    }
+
+    function updateMobileCartBar() {
+      const { total } = getTotals();
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('mobileCartCount').textContent = count;
+      document.getElementById('mobileCartTotal').textContent = money(total);
+    }
+  </script>
+</body>
+</html>
