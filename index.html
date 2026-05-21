@@ -200,6 +200,47 @@
         height: 160px;
       }
     }
+
+    .brand-section {
+      width: 100%;
+    }
+
+    .brand-carousel {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding-bottom: 0.75rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .carousel-card {
+      min-width: 82%;
+      scroll-snap-align: start;
+    }
+
+    .carousel-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: white;
+      font-size: 1.5rem;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .carousel-arrow:hover {
+      background: var(--accent);
+    }
+
+    @media (min-width: 576px) {
+      .carousel-card {
+        min-width: 320px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -263,6 +304,24 @@
     </div>
   </div>
 
+  <div class="modal fade" id="flavorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white" style="border:1px solid var(--border); border-radius:1.25rem;">
+        <div class="modal-header border-0">
+          <div>
+            <h2 class="modal-title h4 fw-bold" id="flavorModalTitle">Choose flavor</h2>
+            <p class="small-note mb-0" id="flavorModalSubtitle"></p>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div id="flavorOptions" class="d-grid gap-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <template id="cartTemplate">
     <div>
       <h2 class="h4 fw-bold mb-3">Your order</h2>
@@ -292,20 +351,29 @@
 
   <script>
     const products = [
-      { id: 1, name: 'Geek Bar Pulse', category: 'Disposable', flavor: 'Blue Razz Ice', price: 19.99, stock: 12, nicotine: '5%', symbol: 'GB' },
-      { id: 2, name: 'Lost Mary OS5000', category: 'Disposable', flavor: 'Watermelon Ice', price: 17.99, stock: 8, nicotine: '5%', symbol: 'LM' },
-      { id: 3, name: 'GeekVape U Pod', category: 'Pods', flavor: '0.7Ω Replacement Pod', price: 9.99, stock: 15, nicotine: 'N/A', symbol: 'UP' },
-      { id: 4, name: 'Salt Nic Bottle', category: 'E-Liquid', flavor: 'Menthol 30ml', price: 14.99, stock: 6, nicotine: '35mg', symbol: 'SN' },
-      { id: 5, name: 'GeekVape Q Pod', category: 'Pods', flavor: '0.8Ω Replacement Pod', price: 9.99, stock: 10, nicotine: 'N/A', symbol: 'QP' },
-      { id: 6, name: 'Disposable Vape', category: 'Disposable', flavor: 'Strawberry Kiwi', price: 16.99, stock: 9, nicotine: '5%', symbol: 'DV' }
+      { id: 1, brand: 'Geek Bar', model: 'Pulse', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 19.99, stock: 12, nicotine: '5%', symbol: 'GB' },
+      { id: 2, brand: 'Geek Bar', model: 'Pulse X', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 21.99, stock: 10, nicotine: '5%', symbol: 'GB' },
+
+      { id: 3, brand: 'Lost Mary', model: 'OS5000', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 17.99, stock: 8, nicotine: '5%', symbol: 'LM' },
+      { id: 4, brand: 'Lost Mary', model: 'MO5000', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 18.99, stock: 7, nicotine: '5%', symbol: 'LM' },
+
+      { id: 5, brand: 'North', model: 'North 5K', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 16.99, stock: 9, nicotine: '5%', symbol: 'N5' },
+      { id: 6, brand: 'North', model: 'North Vision', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 19.99, stock: 6, nicotine: '5%', symbol: 'NV' },
+      { id: 7, brand: 'North', model: 'North Stellar', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 22.99, stock: 5, nicotine: '5%', symbol: 'NS' },
+
+      { id: 8, brand: 'GeekVape', model: 'U Pod', category: 'Pods', flavor: '0.7Ω Replacement Pod', price: 9.99, stock: 15, nicotine: 'N/A', symbol: 'UP' },
+      { id: 9, brand: 'GeekVape', model: 'Q Pod', category: 'Pods', flavor: '0.8Ω Replacement Pod', price: 9.99, stock: 10, nicotine: 'N/A', symbol: 'QP' },
+
+      { id: 10, brand: 'Juice Co.', model: 'Salt Nic Bottle', category: 'E-Liquid', flavor: 'Menthol 30ml', price: 14.99, stock: 6, nicotine: '35mg', symbol: 'SN' }
     ];
 
     const DELIVERY_FEE = 5;
     const MINIMUM_ORDER = 20;
 
-    let selectedCategory = 'All';
+    let selectedCategory = 'Disposable';
     let cart = [];
     let customer = { name: '', phone: '', address: '', notes: '' };
+    let selectedProductForFlavor = null;
 
     const money = value => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
@@ -324,10 +392,13 @@
     }
 
     function renderCategories() {
-      const categories = ['All', ...new Set(products.map(product => product.category))];
+      const categories = [...new Set(products.map(product => product.category))];
+
       const wrapper = document.getElementById('categoryFilters');
       wrapper.innerHTML = categories.map(category => `
-        <button class="btn btn-soft ${category === selectedCategory ? 'active' : ''}" data-category="${category}">${category}</button>
+        <button class="btn btn-soft ${category === selectedCategory ? 'active' : ''}" data-category="${category}">
+          ${category}s
+        </button>
       `).join('');
 
       wrapper.querySelectorAll('button').forEach(button => {
@@ -339,38 +410,77 @@
     }
 
     function renderProducts() {
-      const visibleProducts = selectedCategory === 'All'
-        ? products
-        : products.filter(product => product.category === selectedCategory);
+      const visibleProducts = products.filter(product => product.category === selectedCategory);
 
-      document.getElementById('productGrid').innerHTML = visibleProducts.map(product => `
-        <div class="col-12 col-sm-6">
-          <article class="product-card p-3 h-100">
-            <div class="product-img mb-3">${product.symbol}</div>
-            <div class="d-flex justify-content-between gap-2 mb-1">
-              <h3 class="h5 fw-bold mb-0">${product.name}</h3>
-              <div class="price">${money(product.price)}</div>
+      const brands = [...new Set(visibleProducts.map(product => product.brand))];
+
+      document.getElementById('productGrid').innerHTML = brands.map(brand => {
+        const brandProducts = visibleProducts.filter(product => product.brand === brand);
+        const carouselId = `carousel-${brand.replace(/\s+/g, '-').toLowerCase()}`;
+
+        return `
+          <section class="brand-section mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h4 fw-bold mb-0">${brand}</h2>
+
+              <div class="d-flex gap-2">
+                <button class="carousel-arrow" data-scroll-target="${carouselId}" data-direction="-1">‹</button>
+                <button class="carousel-arrow" data-scroll-target="${carouselId}" data-direction="1">›</button>
+              </div>
             </div>
-            <p class="text-muted-custom small mb-1">${product.flavor}</p>
-            <p class="small-note mb-3">Nicotine: ${product.nicotine} · Stock: ${product.stock}</p>
-            <button class="btn btn-accent w-100 addToCartBtn" data-id="${product.id}">Add to cart</button>
-          </article>
-        </div>
-      `).join('');
 
-      document.querySelectorAll('.addToCartBtn').forEach(button => {
-        button.addEventListener('click', () => addToCart(Number(button.dataset.id)));
+            <div class="brand-carousel" id="${carouselId}">
+              ${brandProducts.map(product => `
+                <article class="product-card p-3 carousel-card">
+                  <div class="product-img mb-3">${product.symbol}</div>
+
+                  <div class="d-flex justify-content-between gap-2 mb-1">
+                    <div>
+                      <h3 class="h5 fw-bold mb-0">${product.model}</h3>
+                    </div>
+                    <div class="price">${money(product.price)}</div>
+                  </div>
+
+                  <p class="small-note mb-3">Nicotine: ${product.nicotine} · Stock: ${product.stock}</p>
+                  <button class="btn btn-accent w-100 chooseFlavorBtn" data-id="${product.id}">Add to order</button>                </article>
+              `).join('')}
+            </div>
+          </section>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.chooseFlavorBtn').forEach(button => {
+        button.addEventListener('click', () => openFlavorModal(Number(button.dataset.id)));
+      });
+
+      document.querySelectorAll('.carousel-arrow').forEach(button => {
+        button.addEventListener('click', () => {
+          const carousel = document.getElementById(button.dataset.scrollTarget);
+          const direction = Number(button.dataset.direction);
+
+          carousel.scrollBy({
+            left: direction * 320,
+            behavior: 'smooth'
+          });
+        });
       });
     }
 
-    function addToCart(productId) {
+    function addToCart(productId, flavor) {
       const product = products.find(item => item.id === productId);
-      const existing = cart.find(item => item.id === productId);
+
+      const existing = cart.find(item =>
+        item.id === productId && item.selectedFlavor === flavor
+      );
 
       if (existing) {
         existing.qty = Math.min(existing.qty + 1, product.stock);
       } else {
-        cart.push({ ...product, qty: 1 });
+        cart.push({
+          ...product,
+          selectedFlavor: flavor,
+          qty: 1
+        });
       }
 
       render();
@@ -412,8 +522,8 @@
           <div class="cart-item mb-2">
             <div class="d-flex justify-content-between gap-2">
               <div>
-                <div class="fw-bold">${item.name}</div>
-                <div class="small text-muted-custom">${item.flavor}</div>
+                <div class="fw-bold">${item.brand} ${item.model}</div>
+                <div class="small text-muted-custom">${item.selectedFlavor}</div>
               </div>
               <button class="btn btn-sm text-white removeBtn" data-id="${item.id}">×</button>
             </div>
@@ -485,7 +595,7 @@
         return;
       }
 
-      const orderLines = cart.map(item => `${item.qty}x ${item.name} - ${item.flavor}`).join('\n');
+      const orderLines = cart.map(item => `${item.qty}x ${item.brand} ${item.model} - ${item.selectedFlavor}`).join('\n');
       alert(`Order request received!\n\n${orderLines}\n\nTotal: ${money(total)}\n\nNext MVP step: send this to SMS, email, or a backend.`);
 
       cart = [];
@@ -503,6 +613,33 @@
       const count = cart.reduce((sum, item) => sum + item.qty, 0);
       document.getElementById('mobileCartCount').textContent = count;
       document.getElementById('mobileCartTotal').textContent = money(total);
+    }
+
+    function openFlavorModal(productId) {
+      selectedProductForFlavor = products.find(product => product.id === productId);
+      if (!selectedProductForFlavor) return;
+
+      document.getElementById('flavorModalTitle').textContent =
+        `${selectedProductForFlavor.brand} ${selectedProductForFlavor.model}`;
+
+      document.getElementById('flavorModalSubtitle').textContent =
+        `${money(selectedProductForFlavor.price)} · Nicotine: ${selectedProductForFlavor.nicotine}`;
+
+      document.getElementById('flavorOptions').innerHTML =
+        selectedProductForFlavor.flavors.map(flavor => `
+          <button class="btn btn-soft text-start flavorChoiceBtn" data-flavor="${flavor}">
+            ${flavor}
+          </button>
+        `).join('');
+
+      document.querySelectorAll('.flavorChoiceBtn').forEach(button => {
+        button.addEventListener('click', () => {
+          addToCart(selectedProductForFlavor.id, button.dataset.flavor);
+          bootstrap.Modal.getInstance(document.getElementById('flavorModal')).hide();
+        });
+      });
+
+      new bootstrap.Modal(document.getElementById('flavorModal')).show();
     }
   </script>
 </body>
