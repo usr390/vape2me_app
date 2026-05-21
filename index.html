@@ -197,7 +197,11 @@
       }
 
       .product-img {
-        height: 160px;
+        height: 300px;
+      }
+
+      .carousel-card {
+        min-width: 250px;
       }
     }
 
@@ -216,7 +220,8 @@
     }
 
     .carousel-card {
-      min-width: 82%;
+      min-width: 72%;
+      max-width: 260px;
       scroll-snap-align: start;
     }
 
@@ -238,8 +243,28 @@
 
     @media (min-width: 576px) {
       .carousel-card {
-        min-width: 320px;
+        min-width: 240px;
       }
+    }
+
+    .product-img {
+      height: 280px;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, var(--panel-2), #111);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-2);
+      font-size: 2.4rem;
+      font-weight: 900;
+      overflow: hidden;
+    }
+
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 1rem;
     }
   </style>
 </head>
@@ -351,22 +376,174 @@
 
   <script>
     const products = [
-      { id: 1, brand: 'Geek Bar', model: 'Pulse', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 19.99, stock: 12, nicotine: '5%', symbol: 'GB' },
-      { id: 2, brand: 'Geek Bar', model: 'Pulse X', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 21.99, stock: 10, nicotine: '5%', symbol: 'GB' },
+      { 
+        id: 5,
+        brand: 'North',
+        model: 'North 5K',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 19.99,
+        stock: 9,
+        nicotine: '5%',
+        puffs: '5000',
+        symbol: 'N5',
+        image: 'images/north5k.png'
+      },
 
-      { id: 3, brand: 'Lost Mary', model: 'OS5000', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 17.99, stock: 8, nicotine: '5%', symbol: 'LM' },
-      { id: 4, brand: 'Lost Mary', model: 'MO5000', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 18.99, stock: 7, nicotine: '5%', symbol: 'LM' },
+      { 
+        id: 6,
+        brand: 'North',
+        model: 'North Vision',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 29.99,
+        stock: 6,
+        nicotine: '5%',
+        puffs: '15000',
+        symbol: 'NV',
+        image: 'images/northvision.webp'
+      },
 
-      { id: 5, brand: 'North', model: 'North 5K', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 16.99, stock: 9, nicotine: '5%', symbol: 'N5' },
-      { id: 6, brand: 'North', model: 'North Vision', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 19.99, stock: 6, nicotine: '5%', symbol: 'NV' },
-      { id: 7, brand: 'North', model: 'North Stellar', category: 'Disposable', flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'], price: 22.99, stock: 5, nicotine: '5%', symbol: 'NS' },
+      { 
+        id: 7,
+        brand: 'North',
+        model: 'North Stellar',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 34.99,
+        stock: 5,
+        nicotine: '5%',
+        puffs: '40000',
+        symbol: 'NS',
+        image: 'images/northstellar.png'
+      },
 
-      { id: 8, brand: 'GeekVape', model: 'U Pod', category: 'Pods', flavor: '0.7Ω Replacement Pod', price: 9.99, stock: 15, nicotine: 'N/A', symbol: 'UP' },
-      { id: 9, brand: 'GeekVape', model: 'Q Pod', category: 'Pods', flavor: '0.8Ω Replacement Pod', price: 9.99, stock: 10, nicotine: 'N/A', symbol: 'QP' },
+      {
+        id: 3,
+        brand: 'Lost Mary',
+        model: 'Turbo MT35000',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 34.99,
+        stock: 8,
+        nicotine: '5%',
+        puffs: '35000',
+        symbol: 'LM',
+        image: 'images/lostmaryturbo.webp'
+      },
 
-      { id: 10, brand: 'Juice Co.', model: 'Salt Nic Bottle', category: 'E-Liquid', flavor: 'Menthol 30ml', price: 14.99, stock: 6, nicotine: '35mg', symbol: 'SN' }
+      {
+        id: 4,
+        brand: 'Lost Mary',
+        model: 'Nera Full View',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 39.99,
+        stock: 7,
+        nicotine: '5%',
+        puffs: '70000',
+        symbol: 'LM',
+        image: 'images/lostmarynera.png'
+      },
+
+      {
+        id: 13,
+        brand: 'Kado Bar',
+        model: 'NI 40000',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 29.99,
+        stock: 9,
+        nicotine: '5%',
+        puffs: '40000',
+        symbol: 'N5',
+        image: 'images/kadobarni40000.png'
+      },
+
+      {
+        id: 14,
+        brand: 'Kado Bar',
+        model: 'Rizz',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 24.99,
+        stock: 6,
+        nicotine: '5%',
+        puffs: '25000',
+        symbol: 'NV',
+        image: 'images/kadobarrizz.png'
+      },
+
+      {
+        id: 15,
+        brand: 'Kado Bar',
+        model: 'Drip',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 34.99,
+        stock: 5,
+        nicotine: '5%',
+        puffs: '35000',
+        symbol: 'NS',
+        image: 'images/kadobardrip.png'
+      },
+
+      {
+        id: 11,
+        brand: 'Foger',
+        model: 'Foger Switch Pro Kit',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 34.99,
+        stock: 8,
+        nicotine: '5%',
+        puffs: '30000',
+        symbol: 'LM',
+        image: 'images/fogerswitchprokit.png'
+      },
+
+      {
+        id: 12,
+        brand: 'Foger',
+        model: 'Fogest',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 29.99,
+        stock: 7,
+        nicotine: '5%',
+        puffs: '15000',
+        symbol: 'LM',
+        image: 'images/fogerfogest.webp'
+      },
+
+      {
+        id: 1,
+        brand: 'Geek Bar',
+        model: 'Pulse',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 29.99,
+        stock: 12,
+        nicotine: '5%',
+        puffs: '15000',
+        symbol: 'GB',
+        image: 'images/geekbarpulse.png'
+      },
+
+      {
+        id: 2,
+        brand: 'Geek Bar',
+        model: 'Pulse X',
+        category: 'Disposable',
+        flavors: ['Blue Razz Ice', 'Miami Mint', 'Watermelon Ice', 'Sour Apple Ice'],
+        price: 34.99,
+        stock: 10,
+        nicotine: '5%',
+        puffs: '25000',
+        symbol: 'GB',
+        image: 'images/geekbarpulsex.png'
+      }
     ];
-
     const DELIVERY_FEE = 5;
     const MINIMUM_ORDER = 20;
 
@@ -432,7 +609,9 @@
             <div class="brand-carousel" id="${carouselId}">
               ${brandProducts.map(product => `
                 <article class="product-card p-3 carousel-card">
-                  <div class="product-img mb-3">${product.symbol}</div>
+                  <div class="product-img mb-3">
+                    <img src="${product.image}" alt="${product.brand} ${product.model}" />
+                  </div>
 
                   <div class="d-flex justify-content-between gap-2 mb-1">
                     <div>
@@ -441,7 +620,7 @@
                     <div class="price">${money(product.price)}</div>
                   </div>
 
-                  <p class="small-note mb-3">Nicotine: ${product.nicotine} · Stock: ${product.stock}</p>
+                  <p class="small-note mb-3">Nicotine: ${product.nicotine} · ${product.puffs ? `${product.puffs} puffs` : 'Multiple flavors'} · Multiple flavors</p>
                   <button class="btn btn-accent w-100 chooseFlavorBtn" data-id="${product.id}">Add to order</button>                </article>
               `).join('')}
             </div>
