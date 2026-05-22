@@ -353,6 +353,10 @@
 
       <div class="border-top pt-3 mb-3" style="border-color:var(--border)!important;">
         <div class="d-flex justify-content-between small mb-1"><span>Subtotal</span><strong class="subtotal">$0.00</strong></div>
+        <div class="d-flex justify-content-between small mb-1">
+        <span>Tax</span>
+          <strong class="tax">$0.00</strong>
+        </div>
         <div class="d-flex justify-content-between small mb-1"><span>Delivery fee</span><strong class="deliveryFee">$0.00</strong></div>
         <div class="d-flex justify-content-between fs-5"><span>Total</span><strong class="total">$0.00</strong></div>
         <p class="minimumWarning small-note mt-2 mb-0"></p>
@@ -553,12 +557,13 @@
       }
     ];
     const DELIVERY_FEE = 7.5;
-    const MINIMUM_ORDER = 20;
+    const MINIMUM_ORDER = 19.99;
 
     let selectedCategory = 'Disposable';
     let cart = [];
     let customer = { name: '', phone: '', address: '', notes: '' };
     let selectedProductForFlavor = null;
+    const TAX_RATE = 0.0825;
 
     const money = value => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
@@ -688,9 +693,25 @@
     }
 
     function getTotals() {
-      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-      const deliveryFee = subtotal > 0 ? DELIVERY_FEE : 0;
-      return { subtotal, deliveryFee, total: subtotal + deliveryFee };
+      const subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.qty,
+        0
+      );
+
+      const tax = subtotal * TAX_RATE;
+
+      const deliveryFee = subtotal > 0
+        ? DELIVERY_FEE
+        : 0;
+
+      const total = subtotal + tax + deliveryFee;
+
+      return {
+        subtotal,
+        tax,
+        deliveryFee,
+        total
+      };
     }
 
     function renderCart(targetId) {
@@ -699,7 +720,7 @@
       target.innerHTML = '';
       target.appendChild(template.content.cloneNode(true));
 
-      const { subtotal, deliveryFee, total } = getTotals();
+      const { subtotal, tax, deliveryFee, total } = getTotals();      
       const cartItems = target.querySelector('.cartItems');
 
       if (cart.length === 0) {
@@ -728,6 +749,7 @@
 
       target.querySelector('.subtotal').textContent = money(subtotal);
       target.querySelector('.deliveryFee').textContent = money(deliveryFee);
+      target.querySelector('.tax').textContent = money(tax);
       target.querySelector('.total').textContent = money(total);
 
       const warning = target.querySelector('.minimumWarning');
@@ -745,23 +767,27 @@
       target.querySelectorAll('.removeBtn').forEach(btn => btn.addEventListener('click', () => removeFromCart(Number(btn.dataset.id))));
 
       target.querySelectorAll('.form-control').forEach(input => {
-        input.addEventListener('input', syncCustomerFromForms);
+        input.addEventListener('input', () => syncCustomerFromForms(targetId));
       });
 
       target.querySelector('.orderForm').addEventListener('submit', event => {
         event.preventDefault();
-        syncCustomerFromForms();
+        syncCustomerFromForms(targetId);
         requestOrder(targetId);
       });
     }
 
-    function syncCustomerFromForms() {
-      const form = document.querySelector('.orderForm');
+    function syncCustomerFromForms(targetId) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      const form = target.querySelector('.orderForm');
       if (!form) return;
-      customer.name = form.querySelector('.customerName').value;
-      customer.phone = form.querySelector('.customerPhone').value;
-      customer.address = form.querySelector('.customerAddress').value;
-      customer.notes = form.querySelector('.customerNotes').value;
+
+      customer.name = form.querySelector('.customerName').value.trim();
+      customer.phone = form.querySelector('.customerPhone').value.trim();
+      customer.address = form.querySelector('.customerAddress').value.trim();
+      customer.notes = form.querySelector('.customerNotes').value.trim();
     }
 
     function requestOrder(targetId) {
