@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { products, Product } from "@/data/products";
+import { products, Product } from "../data/products";
 
 const DELIVERY_FEE = 7.5;
 const MINIMUM_ORDER = 19.99;
