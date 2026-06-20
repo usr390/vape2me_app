@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { products, Product } from "../data/products";
 
 const DELIVERY_FEE = 7.5;
@@ -286,7 +287,13 @@ function ProductCard({ product, onChooseFlavor }: { product: Product; onChooseFl
   return (
     <article className="product-card carousel-card">
       <div className="product-img">
-        <img src={product.image} alt={`${product.brand} ${product.model}`} onError={(event) => { event.currentTarget.style.display = "none"; }} />
+        <Image
+          src={product.image}
+          alt={`${product.brand} ${product.model}`}
+          fill
+          sizes="(min-width: 576px) 208px, 68vw"
+          onError={(event) => { event.currentTarget.style.display = "none"; }}
+        />
         <span className="image-fallback">{product.symbol}</span>
       </div>
 
